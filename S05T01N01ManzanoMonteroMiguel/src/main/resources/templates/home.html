@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout::head"></head>
+<body>
+    <div class="container">
+        <header th:replace="layout::header"></header>
+    </div>
+
+    <div class="container mt-4 table-responsive w-75">
+        <a class="btn btn-primary" title="Add new branch" th:text="'Add branch'" th:href="@{./add}"/>
+        <div class="d-flex justify-content-center"
+             th:if="${branchDTOs != null and !branchDTOs.empty}">
+            <table class="table mt-2">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Country</th>
+                        <th>Type Branch</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="branch : ${branchDTOs}">
+                        <td th:text="${branch.name}">show name</td>
+                        <td th:text="${branch.country}">show country</td>
+                        <td th:text="${branch.branchType}">show country</td>
+                        <td>
+                            <div class="float-end">
+                                <a class="btn btn-warning btn-sm" title="Update branch" th:text="'Update'" th:href="@{./update/} + ${branch.pk_branchID}" />
+                                <a class="btn btn-danger btn-sm" title="Delete branch" th:text="'Delete'" th:href="@{./delete/} + ${branch.pk_branchID}" />
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3 alert alert-warning" role="alert" th:if="${branchDTOs == null or branchDTOs.empty}">
+            No branches available.
+        </div>
+    </div>
+
+    <footer th:replace="layout::footer"></footer>
+    </body>
+</html>

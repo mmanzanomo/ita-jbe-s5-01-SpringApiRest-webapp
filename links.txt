@@ -1,0 +1,12 @@
+CRUD annotations with Spring JPA
+https://amoelcodigo.com/crud-java-sprig-mysql/
+https://www.javaguides.net/2020/05/spring-boot-crud-web-application-with-thymeleaf.html
+
+DTO pattern
+https://www.baeldung.com/java-dto-pattern
+https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
+
+WebClient
+https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/reactive/function/client/WebClient.html
+https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/html/boot-features-webclient.html
+https://howtodoinjava.com/spring-webflux/webclient-get-post-example/

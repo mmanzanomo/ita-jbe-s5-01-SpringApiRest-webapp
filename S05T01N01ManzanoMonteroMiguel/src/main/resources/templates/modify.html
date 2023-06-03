@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout::head"></head>
+<body>
+    <header th:replace="layout::header"></header>
+
+    <div class="container mt-2 row justify-content-center">
+        <div class="col-sm-6 mt-4">
+            <a class="btn btn-secondary btn-sm mb-4" title="Back" th:text="'back'" th:href="@{/branch/}"/>
+            <form th:action="@{/branch/add}" method="post" th:object="${branchDTO}">
+                <div class="form-group">
+                    <input type="hidden" id="pk_branchID" name="pk_branchID" th:field="*{pk_branchID}"/>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" name="Name" th:field="*{name}" class="form-control" placeholder="Name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" id="country" name="Country" th:field="*{country}" class="form-control" placeholder="Country">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" name="save" value="Save" class="btn btn-primary float-end" title="Save" th:text="'Save'" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer th:replace="layout::footer"></footer>
+</body>
+</html>
