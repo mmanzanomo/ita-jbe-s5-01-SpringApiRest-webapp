@@ -19,47 +19,45 @@ public class FlowerService implements IFlowerService {
     }
 
     @Override
-    public FlowerDTO save(FlowerDTO flowerDTO) {
+    public Mono<FlowerDTO> save(FlowerDTO flowerDTO) {
         return webClient.post()
                 .uri("/add")
                 // Emits the body object
                 .body(Mono.just(flowerDTO), FlowerDTO.class)
                 .retrieve()
-                .bodyToMono(FlowerDTO.class).block();
+                .bodyToMono(FlowerDTO.class);
     }
 
     @Override
-    public FlowerDTO update(FlowerDTO flowerDTO) {
+    public Mono<FlowerDTO> update(FlowerDTO flowerDTO) {
         return webClient.put()
                 .uri("/update")
                 .body(Mono.just(flowerDTO), FlowerDTO.class)
                 .retrieve()
-                .bodyToMono(FlowerDTO.class).block();
+                .bodyToMono(FlowerDTO.class);
     }
 
     @Override
-    public void delete(int id) {
-        webClient.delete()
+    public Mono<Void> delete(int id) {
+        return webClient.delete()
                 .uri("/delete/" + id)
                 .retrieve()
-                .bodyToMono(Void.class).block();
+                .bodyToMono(Void.class);
     }
 
     @Override
-    public Optional<FlowerDTO> findOneById(int id) {
+    public Mono<FlowerDTO> findOneById(int id) {
         return webClient.get()
                 .uri("/getOne/" + id)
                 .retrieve()
-                .bodyToMono(FlowerDTO.class).blockOptional();
+                .bodyToMono(FlowerDTO.class);
     }
 
     @Override
-    public List<FlowerDTO> findAll() {
+    public Flux<FlowerDTO> findAll() {
         return webClient.get()
                 .uri("/getAll")
                 .retrieve()
-                .bodyToFlux(FlowerDTO.class)
-                .collectList()
-                .block();
+                .bodyToFlux(FlowerDTO.class);
     }
 }

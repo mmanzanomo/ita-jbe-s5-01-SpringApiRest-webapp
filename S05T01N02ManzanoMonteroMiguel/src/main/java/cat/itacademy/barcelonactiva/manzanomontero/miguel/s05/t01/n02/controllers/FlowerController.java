@@ -28,7 +28,7 @@ public class FlowerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = FlowerDTO.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
-                    content = @Content),
+                    content = @Content)
             })
     @PostMapping("/add")
     public ResponseEntity<FlowerDTO> add(@RequestBody FlowerDTO flowerDTO) {

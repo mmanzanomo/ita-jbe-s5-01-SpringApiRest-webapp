@@ -9,11 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -25,7 +24,7 @@ public class ClientFlowerController {
 
     @Operation(summary = "Add a new flower")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Added flower",
+            @ApiResponse(responseCode = "201", description = "Added flower",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = FlowerDTO.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
@@ -34,10 +33,10 @@ public class ClientFlowerController {
                     content = @Content)
     })
     @PostMapping("/clientFlowersAdd")
-    public ResponseEntity<FlowerDTO> add(@RequestBody FlowerDTO flowerDTO) {
-        FlowerDTO savedFlower = service.save(flowerDTO);
-        if (savedFlower == null) return ResponseEntity.status(500).body(null);
-        return ResponseEntity.status(201).body(savedFlower);
+    public Mono<FlowerDTO> add(@RequestBody FlowerDTO flowerDTO) {
+        return service.save(flowerDTO)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "The flower could not be succefully saved.")));
     }
 
     @Operation(summary = "Update a flower by its id")
@@ -53,12 +52,14 @@ public class ClientFlowerController {
                     content = @Content)
     })
     @PutMapping("/clientFlowersUpdate")
-    public ResponseEntity<FlowerDTO> update(@RequestBody FlowerDTO flowerDTO) {
-        FlowerDTO updatedFlowerDTO = service.update(flowerDTO);
-        if (updatedFlowerDTO != null) {
-            return new ResponseEntity<>(updatedFlowerDTO, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public Mono<FlowerDTO> update(@RequestBody FlowerDTO flowerDTO) {
+        return service.update(flowerDTO)
+                .flatMap(updatedFlower -> {
+                    if (updatedFlower == null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The flower was not found.");
+                    }
+                    return Mono.just(updatedFlower);
+                });
     }
 
     @Operation(summary = "Delete a flower by its id")
@@ -74,13 +75,8 @@ public class ClientFlowerController {
                     content = @Content)
     })
     @DeleteMapping("/clientFlowersDelete/{id}")
-    public ResponseEntity<FlowerDTO> delete(@PathVariable int id) {
-        try {
-            this.service.delete(id);
-            return ResponseEntity.status(204).body(null);
-        } catch (Exception e) {
-            return  ResponseEntity.status(500).body(null);
-        }
+    public Mono<Void> delete(@PathVariable int id) {
+        return service.delete(id);
     }
 
     @Operation(summary = "Get all flowers")
@@ -88,15 +84,15 @@ public class ClientFlowerController {
             @ApiResponse(responseCode = "200", description = "Found the list of flowers",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = FlowerDTO.class)) }),
+            @ApiResponse(responseCode = "204", description = "No content",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Did not find any Flower",
                     content = @Content),
             @ApiResponse(responseCode = "500", description = "No connection to Flowers REST API",
                     content = @Content) })
     @GetMapping("/getAll")
-    public ResponseEntity<List<FlowerDTO>> findAll() {
-        List<FlowerDTO> list = this.service.findAll();
-        if (list.isEmpty()) return ResponseEntity.status(204).body(null);
-        return ResponseEntity.status(200).body(list);
+    public Flux<FlowerDTO> findAll() {
+        return service.findAll();
     }
 
     @Operation(summary = "Get a flower by its id")
@@ -112,12 +108,14 @@ public class ClientFlowerController {
                     content = @Content)
     })
     @GetMapping("/getOne/{id}")
-    public ResponseEntity<FlowerDTO> findOneById(@PathVariable int id) {
-        Optional<FlowerDTO> flowerDTO = this.service.findOneById(id);
-        if (flowerDTO.isPresent()) {
-            return ResponseEntity.status(200).body(flowerDTO.get());
-        }
-        return ResponseEntity.status(404).body(null);
+    public Mono<FlowerDTO> findOneById(@PathVariable int id) {
+        return service.findOneById(id)
+                .flatMap(flower -> {
+                    if (flower == null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The flower was not found.");
+                    }
+                    return Mono.just(flower);
+                });
     }
 
 }
